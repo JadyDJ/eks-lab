@@ -1,0 +1,17 @@
+{
+  "name": "create_images",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "bestzip ../create_image_lambda.zip create_image_lambda.js node_modules/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.144.0",
+    "bestzip": "^1.1.4",
+    "util": "^0.10.3"
+  }
+}
