@@ -31,13 +31,10 @@ mkdir -p /etc/chef
 # curl $${CURL_ARG} -o /etc/chef/merge.sh "$${S3_BUCKET}/utils/merge.sh"
 # curl $${CURL_ARG} -o /etc/chef/chef-max.sh "$${S3_BUCKET}/utils/chef-max.sh"
 # curl $${CURL_ARG} -o /etc/chef/cookbooks.tar.gz "$${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz"
-s3 cp --region "$${#my_region}" s3://${S3_BUCKET}/utils/merge.sh  /etc/chef/merge.sh
-my_region="us-east-1"3 cp --region "$${i
-#my_region}" s3://${S3_BUCKET}/utils/chef-max.sh /etc/chef/chef-max.sh
-my_region="us-east-1"3 cp --region "$${i
-#my_region}" s3://${S3_BUCKET}/cookbooks/${COOKBOOK}/${COOKBOOK}.${VERSION}.tar.gz /etc/chef/cookbooks.tar.gz
-my_region="us-east-1"d /etc/chef && tari
- -xvf cookbooks.tar.gz && echo ${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz > artifactory-value && rm -rf /etc/chef/cookbooks.tar.gz
+s3 cp --region "$${my_region}" s3://${S3_BUCKET}/utils/merge.sh  /etc/chef/merge.sh
+s3 cp --region "$${my_region}" s3://${S3_BUCKET}/utils/chef-max.sh /etc/chef/chef-max.sh
+s3 cp --region "$${my_region}" s3://${S3_BUCKET}/cookbooks/${COOKBOOK}/${COOKBOOK}.${VERSION}.tar.gz /etc/chef/cookbooks.tar.gz
+cd /etc/chef && tar -xvf cookbooks.tar.gz && echo ${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz > artifactory-value && rm -rf /etc/chef/cookbooks.tar.gz
 cd /etc/chef && echo $${CHEF_ENV} > env-value && echo ${COOKBOOK} > cookbook-value && echo $${CHEF_RUNLIST} > roles-value && chmod 777 merge.sh && chmod 777 chef-max.sh && ./merge.sh cookbooks/$${COOKBOOK}/environments/$${CHEF_ENV}.json cookbooks/$${COOKBOOK}/roles/$${CHEF_RUNLIST}.json > json_attribs.json
 echo 'export PATH=$PATH:/etc/chef' >> ~/.bashrc && source ~/.bashrc
 mkdir -p /var/log/chef
