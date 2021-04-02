@@ -49,3 +49,9 @@ variable "stack_id" {
   default     = "terraform_stack_id"
   # The name of the role file you want to target (no extension)
 }
+
+variable "s3_bucket" {
+  description = "S3 bucket for stack"
+  default     = "jdtest-terraform-states"
+  # The name of the role file you want to target (no extension)
+}
