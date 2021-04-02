@@ -7,7 +7,8 @@ S3_BUCKET="jdtest-terraform-states"
 COOKBOOK="${chef_cookbook}"
 INPUTVERSION="${chef_cookbook_version}"
 version="$(chef-client --version)"
-my_region="$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)"
+#my_region="$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)"
+my_region="us-east-1"
 # CURL_ARG="--connect-timeout 5 --max-time 30 --retry 5 --retry-delay 0"
 # --max-time 30     (how long each retry will wait)
 # --retry 5         (it will retry 5 times)
@@ -30,10 +31,13 @@ mkdir -p /etc/chef
 # curl $${CURL_ARG} -o /etc/chef/merge.sh "$${S3_BUCKET}/utils/merge.sh"
 # curl $${CURL_ARG} -o /etc/chef/chef-max.sh "$${S3_BUCKET}/utils/chef-max.sh"
 # curl $${CURL_ARG} -o /etc/chef/cookbooks.tar.gz "$${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz"
-s3 cp --region "$${my_region}" s3://${S3_BUCKET}/utils/merge.sh  /etc/chef/merge.sh
-s3 cp --region "$${my_region}" s3://${S3_BUCKET}/utils/chef-max.sh /etc/chef/chef-max.sh
-s3 cp --region "$${my_region}" s3://${S3_BUCKET}/cookbooks/${COOKBOOK}/${COOKBOOK}.${VERSION}.tar.gz /etc/chef/cookbooks.tar.gz
-cd /etc/chef && tar -xvf cookbooks.tar.gz && echo ${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz > artifactory-value && rm -rf /etc/chef/cookbooks.tar.gz
+s3 cp --region "$${#my_region}" s3://${S3_BUCKET}/utils/merge.sh  /etc/chef/merge.sh
+my_region="us-east-1"3 cp --region "$${i
+#my_region}" s3://${S3_BUCKET}/utils/chef-max.sh /etc/chef/chef-max.sh
+my_region="us-east-1"3 cp --region "$${i
+#my_region}" s3://${S3_BUCKET}/cookbooks/${COOKBOOK}/${COOKBOOK}.${VERSION}.tar.gz /etc/chef/cookbooks.tar.gz
+my_region="us-east-1"d /etc/chef && tari
+ -xvf cookbooks.tar.gz && echo ${S3_BUCKET}/cookbooks/$${COOKBOOK}/$${COOKBOOK}.$${VERSION}.tar.gz > artifactory-value && rm -rf /etc/chef/cookbooks.tar.gz
 cd /etc/chef && echo $${CHEF_ENV} > env-value && echo ${COOKBOOK} > cookbook-value && echo $${CHEF_RUNLIST} > roles-value && chmod 777 merge.sh && chmod 777 chef-max.sh && ./merge.sh cookbooks/$${COOKBOOK}/environments/$${CHEF_ENV}.json cookbooks/$${COOKBOOK}/roles/$${CHEF_RUNLIST}.json > json_attribs.json
 echo 'export PATH=$PATH:/etc/chef' >> ~/.bashrc && source ~/.bashrc
 mkdir -p /var/log/chef
