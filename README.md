@@ -1,63 +1,92 @@
-# ep-terraform-modules
+
+# Terraform Template for userdata from EP
+==========================================
+
+Heavily inspired by Respawn userdata injection
+
+Further details about [chef-max userdata](https://www.terraform.io/docs/providers/template/d/file.html) is available.
 
 
-A GitHub repository for sharing Terraform modules made by the community/EP for public use.
+Module Input Variables
+----------------------
 
-## MODULE SOURCES
+- `chef_cookbook_version` **(Optional)** - Chef cookbook version if you want to pin or `latest` if you want the latest every run.
+- `chef_cookbook` - The name of the cookbook that chef-max should pick up.
+- `chef_interval` :
+  - **(Optional) - for linux**, give a cron for [chef-max interval](https://crontab.guru/)
+  - **(Optional) - for windows**, the frequency (in seconds)
+    - e.g `1800` for running chef-max every 1800 seconds
+    - e.g `0` for not running chef-max again after the first run on instance creation.
+  - `chef_interval` is optional and will defaults to no cron/interval when this param is not given.
+- `chef_env` - Chef environment that chef-max should target (no .json extension)
+- `chef_role` - Chef role that chef-max should target ( no .json extension)
 
-As documented , the only required parameter when using a module is source. The source parameter tells Terraform where the module can be found and what constraints to put on the module. Constraints can include a specific version or Git branch.
+extra for windows:
 
-Terraform manages modules for you: it downloads them, organizes them on disk, checks for updates, etc. Terraform uses this source parameter to determine where it should retrieve and update modules from.
-
-Terraform supports the following sources:
-
-- Local file paths
-
-- GitHub
+- `region` = "${var.region}"
+- `stack_name` = "${var.stack_name}"
+- `stack_id`  = "${var.stack_id}"
+- `lc_name` = "${var.lc_name}"
 
 
+Usage
+-----
 
-### GitHub
+`Linux`
 
-Terraform will automatically recognize GitHub URLs and turn them into a link to the specific Git repository. **The syntax is simple**:
-
-```
-module "consul" {
-    source = "github.com/hashicorp/example"
+```js
+module "chef-max" {
+  source = "git::https://github.dowjones.net/djin-productivity/ep-terraform-modules//tf_aws_userdata"
+  chef_role = "test_role"
+  chef_env = "chef_env"
+  chef_interval = "* * * * *" # optional
+  chef_cookbook = "chef_cookbook"
+  chef_cookbook_version = "1.0.8" # optional
 }
-```
-Subdirectories within the repository can also be referenced:
+
+resource "aws_instance" "example" {
+      ami           = "sample-ami"
+      instance_type = "m3.medium"
+      user_data = "${module.chef-max.linux_userdata}"
+      subnet_id = "sample-subnet"
+
+      lifecycle {
+          create_before_destroy = true
+      }
+  }
 
 ```
-module "consul" {
-    source = "github.com/hashicorp/example//subdir"
+
+`Windows`
+
+```js
+module "chef-max" {
+  source = "git::https://github.dowjones.net/djin-productivity/ep-terraform-modules//tf_aws_userdata"
+  chef_role = "test_role"
+  chef_env = "chef_env"
+  chef_cookbook = "chef_cookbook"
+  chef_interval = "0"  # optional
+  region = "${var.region}"
+  stack_name = "${var.stack_name}"
+  stack_id  = "${var.stack_id}"
+  lc_name = "${var.lc_name}"
 }
-```
 
-These will fetch the modules using HTTPS. If you want to use SSH instead:
+resource "aws_instance" "example" {
+      ami           = "sample-ami"
+      instance_type = "m3.medium"
+      user_data = "${module.chef-max.windows_userdata}"
+      subnet_id = "sample-subnet"
 
-```
-module "consul" {
-    source = "git@github.com:hashicorp/example.git//subdir"
-}
-```
-
-> Note: *The double-slash, //, is important. It is what tells Terraform that that is the separator for a subdirectory, and not part of the repository itself*.
-
-GitHub source URLs require that Git is installed on your system and that you have access to the repository.
-
-You can use the same parameters to GitHub repositories as you can generic Git repositories (such as tags or branches). See the documentation for generic Git repositories for more information.
-
-### Private GitHub Repos
-
-If you need Terraform to be able to fetch modules from private GitHub repos on a remote machine (like Atlas or a CI server), you'll need to provide Terraform with credentials that can be used to authenticate as a user with read access to the private repo.
-
-First, create a machine user on GitHub with read access to the private repo in question, then embed this user's credentials into the source parameter:
+      lifecycle {
+          create_before_destroy = true
+      }
+  }
 
 ```
-module "private-infra" {
-  source = "git::https://MACHINE-USER:MACHINE-PASS@github.com/org/privatemodules//modules/foo"
-}
-```
 
-> Note: *Terraform does not yet support interpolations in the source field, so the machine username and password will have to be embedded directly into the source string. You can track GH-1439 to learn when this limitation is addressed.*
+- For windows : userdata runs chef-max.txt which downloads chef-max-2012/chef-max-2008 in the instance. This powershell script is bringing in chef-max.ps1/chef-max.bat for manual runs besides creating chef-max service in the instance.
+
+Author
+------
+Created and maintained by [Kuber Kaul](https://github.dowjones.net/kaulk)
