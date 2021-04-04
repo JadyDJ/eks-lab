@@ -3,7 +3,7 @@
 CHEF_RUNLIST="${chef_role}"
 CHEF_ENV="${chef_env}"
 INTERVAL="${chef_interval}"
-S3_BUCKET="${var.s3_bucket}"
+S3_BUCKET="${s3_bucket}"
 COOKBOOK="${chef_cookbook}"
 INPUTVERSION="${chef_cookbook_version}"
 version="$(chef-client --version)"

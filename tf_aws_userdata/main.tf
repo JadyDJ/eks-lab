@@ -10,6 +10,7 @@ data "template_file" "linux_userdata" {
     chef_interval         = "${var.chef_interval}"
     chef_cookbook         = "${var.chef_cookbook}"
     chef_cookbook_version = "${var.chef_cookbook_version}"
+    s3_bucket             = "${var.s3_bucket}"
   }
 }
 
